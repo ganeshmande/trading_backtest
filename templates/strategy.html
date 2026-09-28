@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3C Reversal Breakout Strategy</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='strategy.css') }}">
+</head>
+<body>
+<header>
+  <div><div class="brandline"><span class="brandmark">N</span><div><div class="eyebrow">STRATEGY LAB</div><h1>3C Reversal Breakout</h1><p>SC1 → SC2 → SC3 → RC → TC · 1:2 risk/reward · completed candles only</p></div></div></div>
+  <nav class="page-nav"><div class="top-clock"><span>INDIA TIME</span><b id="clock">--:--:--</b></div><div class="global-setting"><div><span>SC WICK/BODY LIMIT</span><small id="settingsStatus">Loading…</small></div><label><input id="globalScLimit" type="number" min="1" step="0.01" value="40"><b>%</b></label><button id="saveScLimit" class="nav-glow-action">Save</button></div><a class="nav-glow" href="/">Home</a><a class="nav-glow" href="/history">History</a><a class="nav-glow active" href="/strategy">Strategy</a><a class="nav-glow" href="/fetch-data">Data Center</a><button id="runNow" class="nav-glow-action">Run Selected</button></nav>
+</header>
+<main>
+<section class="strategy-notice"><b>Current setup rule:</b> SC1 + SC2 + SC3 must all be strong: <strong>total upper + lower wick ≤ current editable limit × body</strong>. RC is exempt and only needs to be the opposite color. <b>TC is the immediate next candle only.</b> Weak SC setups are excluded from trade output but retained below in <b>Failed Setup Study</b> for learning.</section>
+<section class="strategy-controls panel">
+  <label>TIMEFRAME<select id="interval"><option>1m</option><option selected>5m</option><option>15m</option><option>30m</option><option>1h</option><option>1d</option></select></label>
+  <label>STRATEGY<select id="side"><option value="BOTH" selected>Both directions</option><option value="LONG">Long only</option><option value="SHORT">Short only</option></select></label>
+  <label>TRIGGER WINDOW<select id="validity"><option value="1" selected>Immediate next candle only</option></select></label>
+  <label>SYMBOL<input id="symbolSearch" placeholder="Search symbol"></label>
+  <button id="selectNifty50">Nifty 50</button><button id="selectNifty100">Nifty 100</button><button id="selectIndices">All Index</button><button id="selectAll">All</button><button id="clearAll">Clear</button>
+  <div class="strategy-meta date-meta"><span>BACKTEST DATE</span><input id="strategyBacktestDate" type="date" aria-label="Backtest date"></div><button id="strategyToday" class="nav-glow date-quick">Today</button><button id="openMonthlyStudy" class="nav-glow-action">1-Month SL / Target Study</button><button id="strategyApplyDate" class="nav-glow date-quick">Apply Date</button><div class="strategy-meta"><span>LAST UPDATE</span><b id="lastUpdate">—</b></div><div class="strategy-meta strategy-status"><span>STATUS</span><b id="status">Waiting…</b></div><div class="strategy-meta"><span>JOURNAL SCOPE</span><b id="dateScope">TODAY</b></div><label class="sort-control">SORT TRADES<select id="tradeSort"><option value="newest" selected>Newest trigger time</option><option value="oldest">Oldest trigger time</option><option value="created_newest">Newest record</option><option value="created_oldest">Oldest record</option></select></label>
+</section>
+<section class="symbol-panel panel"><div class="symbol-head"><div><h2>Selected Instruments</h2><p>Only selected instruments are evaluated. Select symbols first, then run the strategy.</p></div><span id="selectedCount">0 selected</span></div><div id="symbols" class="symbols"></div></section>
+<section class="strategy-summary">
+  <div><span>PERFECT SETUPS</span><strong id="statSetups">0</strong><small>All SC1–SC3 pass limit</small></div>
+  <div><span>TRADES PUNCHED</span><strong id="statTrades">0</strong><small>Immediate TC triggers</small></div>
+  <div><span>ACTIVE</span><strong id="statActive">0</strong><small>SL currently active</small></div>
+  <div><span>TARGET</span><strong id="statTarget">0</strong><small>1:2 target reached</small></div>
+  <div><span>SL</span><strong id="statSL">0</strong><small>Normal SL hits</small></div>
+  <div><span>SYSTEMATIC SL</span><strong id="statSystematic">0</strong><small>TC closed beyond SL</small></div>
+  <div><span>AMBIGUOUS</span><strong id="statAmbiguous">0</strong><small>SL + target both touched</small></div>
+  <div><span>TOTAL R</span><strong id="statR">0R</strong><small>Resolved trades</small></div>
+  <div><span>FAILED STUDY</span><strong id="statFailed">0</strong><small>Weak SC or failed TC</small></div>
+</section>
+<section class="panel strategy-panel"><div class="panel-head"><div><h2>Trade Journal · Selected Backtest Date</h2><p>Only perfect setups that pass the current SC strength limit can create trades. The Strategy Lab evaluates only the selected Backtest Date; no candles from another date are used.</p></div><button id="clearTrades" class="danger">Clear Strategy History</button></div>
+<div class="strategy-table-wrap"><table class="strategy-table"><thead><tr><th>ID</th><th>Symbol</th><th>TF</th><th>Direction</th><th>Pattern</th><th>Setup Level</th><th>Entry</th><th>SL</th><th>Target 1:2</th><th>Trigger Candle</th><th>SL Activation</th><th>Status</th><th>Result</th><th>R</th><th>Details</th></tr></thead><tbody id="tradesBody"></tbody></table></div></section>
+<section class="panel setup-panel perfect-panel"><div class="panel-head"><div><h2>Perfect Setups / Trigger Monitor</h2><p>Only setups passing all three SC strength checks are shown. RC is exempt from the strength rule.</p></div><span class="perfect-badge">PERFECT SETUP ONLY</span></div><div class="strategy-table-wrap"><table class="strategy-table setup-monitor-table"><thead><tr><th>Symbol</th><th>TF</th><th>Pattern</th><th>SC1 W/B</th><th>SC2 W/B</th><th>SC3 W/B</th><th>Limit</th><th>Breakout / Breakdown</th><th>RC Close</th><th>TC Status</th><th>Setup Time</th></tr></thead><tbody id="setupsBody"></tbody></table></div></section>
+<section class="panel setup-panel failed-study-panel"><div class="panel-head"><div><h2>Failed Setup Study — 3 SC + RC Completed</h2><p>Study-only audit. A failed setup is never a trade. It is shown here only after SC1 + SC2 + SC3 + RC are completed, with the exact reason it failed.</p></div><span class="study-badge">STUDY ONLY · NO TRADE</span></div><div class="strategy-table-wrap"><table class="strategy-table failed-table"><thead><tr><th>Symbol</th><th>TF</th><th>Pattern</th><th>SC1 W/B</th><th>SC2 W/B</th><th>SC3 W/B</th><th>Limit</th><th>Breakout / Breakdown</th><th>RC Close</th><th>Failure</th><th>Why Failed</th><th>Setup Time</th></tr></thead><tbody id="failedSetupsBody"></tbody></table></div></section>
+<section class="rules-grid"><article><h3>SC STRENGTH FILTER</h3><p>For each of SC1, SC2 and SC3: <b>Total Wick / Body × 100 ≤ current editable limit</b>. One weak SC invalidates the entire setup. Doji/zero-body SC is invalid.</p></article><article><h3>LONG · G G G R → TC</h3><p>SC1, SC2, SC3 are Green; RC is Red. Highest High across all four candles is the breakout level. TC must cross above it.</p></article><article><h3>SHORT · R R R G → TC</h3><p>SC1, SC2, SC3 are Red; RC is Green. Lowest Low across all four candles is the breakdown level. TC must cross below it.</p></article><article><h3>ENTRY-CANDLE RULE</h3><p>TC can trigger the trade. At TC close, a close beyond SL is Systematic SL; otherwise SL activates from the next candle. Later candles resolve normal SL/target.</p></article><article><h3>FAILED SETUP STUDY</h3><p>Weak-SC failures and strong-setup/no-cross failures are recorded for study only. No later candle can revive a failed setup.</p></article><article><h3>OHLC LIMITATION</h3><p>OHLC proves a level was crossed but not the exact tick. Entry is recorded at the theoretical level. Same-candle SL + target is Ambiguous.</p></article></section>
+</main>
+<footer class="page-note">All times shown in 12-hour format and use India Standard Time (IST).</footer>
+<div id="modal" class="modal hidden"><div class="modalbox strategy-modal"><button id="close">×</button><div class="eyebrow">TRADE DETAIL</div><h2 id="modalTitle"></h2><p id="modalSub"></p><div id="modalBody"></div></div></div>
+<script>window.STRATEGY_SYMBOLS={{ (symbols + indices)|tojson }};window.STRATEGY_NIFTY50={{ nifty50|tojson }};window.STRATEGY_NIFTY100={{ nifty100|tojson }};window.STRATEGY_INDICES={{ indices|tojson }};</script>
+<script src="{{ url_for('static', filename='strategy.js') }}"></script><script src="{{ url_for('static', filename='settings.js') }}"></script>
+</body></html>

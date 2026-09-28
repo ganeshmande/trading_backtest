@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Market Pattern Dashboard</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+<header>
+  <div><div class="brandline"><span class="brandmark">N</span><div><div class="eyebrow">NIFTY CANDLE SCANNER</div><h1>Market Pattern Dashboard</h1><p>Closed-candle analysis only · 7-candle reversal scanner</p></div></div></div>
+  <nav class="page-nav"><div class="top-clock"><span>INDIA TIME</span><b id="clock">--:--:--</b></div><div class="global-setting"><div><span>SC WICK/BODY LIMIT</span><small id="settingsStatus">Loading…</small></div><label><input id="globalScLimit" type="number" min="1" step="0.01" value="40"><b>%</b></label><button id="saveScLimit" class="nav-glow-action">Save</button></div><a class="nav-glow active" href="/">Home</a><a class="nav-glow" href="/history">History</a><a class="nav-glow" href="/strategy">Strategy</a><a class="nav-glow" href="/fetch-data">Data Center</a><button id="scanNow" class="nav-glow-action">Scan Now</button></nav>
+</header>
+<main>
+<section class="notice"><b>⚡ Instant trigger:</b> newest <strong>completed</strong> candle creates <strong>3 GREEN → RED</strong> or <strong>3 RED → GREEN</strong> only when SC1–SC3 pass the editable Wick/Body limit. <span>RC is exempt. Latest 7 closed candles are retained for every row and each candle shows Wick/Body %.</span></section>
+<section class="controls">
+  <label>TIMEFRAME<select id="interval"><option>1m</option><option selected>5m</option><option>15m</option><option>30m</option><option>1h</option><option>1d</option></select></label>
+  <label>AUTO REFRESH<select id="refresh"><option value="5000" selected>5 sec</option><option value="10000">10 sec</option><option value="15000">15 sec</option><option value="30000">30 sec</option><option value="60000">60 sec</option></select></label>
+  <div class="refresh-meta"><span>LAST REFRESH</span><b id="lastRefresh">—</b></div><div class="refresh-meta"><span>STATUS</span><b id="status">Waiting…</b></div>
+</section>
+<section class="summary"><div><span>Indices</span><strong id="indexCount">3</strong><small>NIFTY 50 · SENSEX · BANK NIFTY</small></div><div><span>Stocks scanned</span><strong id="stockCount">—</strong><small>Current watchlist</small></div><div><span>Active signals</span><strong id="signalCount">0</strong><small>5-minute dashboard hold</small></div><div><span>Scan processing</span><strong id="scanTime">—</strong><small>Last completed scan</small></div></section>
+<section id="signalPanel" class="panel hidden"><div class="panel-head"><div><h2>🔥 Stocks on Dashboard</h2><p>Signal remains visible for 5 minutes after detection.</p></div><span class="panel-note">Live scanner</span></div><div id="signals"></div></section>
+<section class="panel data-panel"><div class="heading"><div><h2>Latest 7-Candle Data</h2><p>Every row contains the latest 7 <b>closed</b> candles. Click a row for full OHLC and candle times.</p></div><div class="legend"><span>● GREEN</span><span>● RED</span><span>● DOJI</span></div></div>
+<div class="section-title">📊 INDICES <b id="indexSectionCount">3</b></div><div class="table-wrap"><table><thead><tr><th>S.No.</th><th>Symbol</th><th>Company</th><th>Index</th><th>7 Closed Candles · OHLC Chart</th><th>Signal</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr></thead><tbody id="indicesBody"></tbody></table></div>
+<div class="section-title">📈 STOCKS <b id="stockSectionCount">—</b></div><div class="table-tools"><input id="stockSearch" placeholder="Search stock / index membership…"></div><div class="table-wrap"><table><thead><tr><th>S.No.</th><th>Symbol</th><th>Company</th><th>Index</th><th>7 Closed Candles · OHLC Chart</th><th>Signal</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr></thead><tbody id="stocksBody"></tbody></table></div></section>
+<footer class="page-note">All times shown in 12-hour format and use India Standard Time (IST).</footer>
+</main>
+<div id="modal" class="modal hidden"><div class="modalbox"><button id="close">×</button><div class="eyebrow">CANDLE DETAIL</div><h2 id="modalTitle"></h2><p id="modalSub"></p><div id="modalBody"></div></div></div>
+<script src="{{ url_for('static', filename='app.js') }}"></script><script src="{{ url_for('static', filename='settings.js') }}"></script></body></html>

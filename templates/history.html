@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIFTY Signal History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
+</head>
+<body>
+
+<header class="topbar history-topbar">
+    <div>
+        <div class="eyebrow">NIFTY 50 · SIGNAL HISTORY</div>
+        <h1>Detailed Pattern History</h1>
+        <div class="subtitle">Complete 7-candle evidence for every stored signal. Signals use the same SC1–SC3 strength gate as Strategy.</div>
+    </div>
+
+    <div class="history-actions"><div class="global-setting"><div><span>SC WICK/BODY LIMIT</span><small id="settingsStatus">Loading…</small></div><label><input id="globalScLimit" type="number" min="1" step="0.01" value="40"><b>%</b></label><button id="saveScLimit" class="nav-glow-action">Save</button></div>
+        <div class="history-refresh">
+            <label for="historyRefresh">REFRESH</label>
+            <select id="historyRefresh"><option value="5000" selected>5 sec</option><option value="10000">10 sec</option><option value="15000">15 sec</option><option value="30000">30 sec</option><option value="60000">60 sec</option><option value="0">Off</option></select>
+        </div>
+        <div class="last-refreshed"><span>LAST REFRESH</span><strong id="lastHistoryRefresh">—</strong></div>
+        <div class="india-time">
+            <span>INDIA TIME</span>
+            <strong id="historyClock">--:--:--</strong>
+        </div>
+        <a href="/" class="nav-link nav-glow">Home</a><a href="/history" class="nav-link nav-glow active">History</a><a href="/strategy" class="nav-link nav-glow">Strategy</a><a href="/fetch-data" class="nav-link nav-glow">Data Center</a>
+        <button id="clearHistory" class="danger-outline">Clear History</button>
+    </div>
+</header>
+
+<main class="history-container">
+
+    <section class="history-info">
+        <div class="info-icon">◷</div>
+        <div>
+            <strong>History timing</strong>
+            <span>Pattern candle time → candle closed time → dashboard detection time. Wick/Body % is shown for every candle.</span>
+            <small>The running candle is never stored as evidence. Daily archive: <b>data/daily/YYYY-MM-DD/signals.csv</b></small>
+        </div>
+    </section>
+
+    <section class="history-controls">
+        <div class="search-wrap">
+            <label for="historySearch">SEARCH HISTORY</label>
+            <input id="historySearch"
+                   type="search"
+                   placeholder="Search symbol, company, timeframe, index...">
+        </div>
+
+        <div class="filter-wrap">
+            <label for="indexFilter">INDEX</label>
+            <select id="indexFilter">
+                <option value="">All</option>
+                <option value="NIFTY 50">NIFTY 50</option>
+                <option value="NIFTY 100">NIFTY 100</option>
+                <option value="NIFTY 150">NIFTY 150</option>
+                <option value="NIFTY 200">NIFTY 200</option>
+                <option value="SENSEX">SENSEX</option>
+                <option value="NIFTY BANK">NIFTY BANK</option>
+                <option value="N50 & N100">N50 & N100</option>
+                <option value="N100">N100</option>
+                <option value="OTHER">OTHER</option>
+                <option value="INDEX">INDEX</option>
+            </select>
+        </div>
+
+        <div class="filter-wrap specific-filter">
+            <label for="specificIndex">SPECIFIC INDEX</label>
+            <input id="specificIndex" placeholder="e.g. NIFTY IT">
+        </div>
+
+        <div class="filter-wrap">
+            <label for="timeframeFilter">TIMEFRAME</label>
+            <select id="timeframeFilter">
+                <option value="">All</option>
+                <option value="1m">1m</option>
+                <option value="5m">5m</option>
+                <option value="15m">15m</option>
+                <option value="30m">30m</option>
+                <option value="1h">1h</option>
+                <option value="1d">1d</option>
+            </select>
+        </div>
+
+        <div class="filter-wrap date-filter">
+            <label for="historyDateFrom">DATE FROM</label>
+            <input id="historyDateFrom" type="date">
+        </div>
+
+        <div class="filter-wrap date-filter">
+            <label for="historyDateTo">DATE TO</label>
+            <input id="historyDateTo" type="date">
+        </div>
+
+        <div class="date-actions">
+            <button id="historyToday" class="nav-glow">Today</button>
+            <button id="historyApplyDates" class="nav-glow">Apply Dates</button>
+            <button id="historyAllDates" class="nav-glow">All Dates</button>
+        </div>
+
+        <div class="filter-wrap">
+            <label for="historySort">SORT DATE</label>
+            <select id="historySort">
+                <option value="newest" selected>Newest first</option>
+                <option value="oldest">Oldest first</option>
+            </select>
+        </div>
+
+        <div class="filter-wrap">
+            <label for="limit">SHOW</label>
+            <select id="limit">
+                <option value="100">100 events</option>
+                <option value="250">250 events</option>
+                <option value="500" selected>500 events</option>
+                <option value="1000">1000 events</option>
+                <option value="5000">5000 events</option>
+            </select>
+        </div>
+
+        <div class="history-refresh-state"><span>CSV</span><strong id="csvStatus">AUTO SYNC</strong></div>
+
+        <div class="history-count">
+            <strong id="visibleCount">0</strong>
+            <span>events</span>
+        </div>
+        <div class="history-date-status"><span>DATE RANGE</span><strong id="historyDateStatus">All dates</strong></div>
+    </section>
+
+    <section class="history-panel">
+        <div class="history-panel-header">
+            <div>
+                <h2>Detected Pattern History</h2>
+                <p>Each row contains the exact 7-candle pattern that triggered the signal.</p>
+            </div>
+            <div class="history-legend">
+                <span class="legend-chip both">N50 & N100</span>
+                <span class="legend-chip n100">N100</span>
+                <span class="legend-chip other">OTHER</span>
+            </div>
+        </div>
+
+        <div class="history-table-wrap">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Detected At</th>
+                        <th>Symbol</th>
+                        <th>Index</th>
+                        <th>TF</th>
+                        <th>7-Candle Pattern</th>
+                        <th>7-Candle OHLC</th>
+                        <th>Signal</th>
+                        <th>Signal Candle</th>
+                        <th>Candle Closed</th>
+                        <th>Open</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Close</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr>
+                        <td colspan="15" class="loading-cell">Loading history...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+<footer class="page-note">All times shown in 12-hour format and use India Standard Time (IST).</footer>
+
+</main>
+
+<div id="historyModal" class="history-modal hidden">
+    <div class="history-modal-card">
+        <div class="history-modal-head">
+            <div>
+                <div class="eyebrow" id="modalEyebrow">7-CANDLE EVIDENCE</div>
+                <h2 id="modalTitle">Signal Details</h2>
+                <p id="modalSub"></p>
+            </div>
+            <button id="closeHistoryModal" class="modal-close">×</button>
+        </div>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='history.js') }}"></script><script src="{{ url_for('static', filename='settings.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+const $=id=>document.getElementById(id);
+async function health(){const r=await fetch('/api/admin/health?_='+Date.now());const d=await r.json();if(!r.ok){$('health').textContent=d.error||'Unable to load';return}const c=d.coverage||{};$('health').innerHTML=Object.entries(c).map(([tf,v])=>`<div><b>${tf}</b> · ${v.min_date||'—'} → ${v.max_date||'—'} · ${Number(v.rows||0).toLocaleString('en-IN')} rows</div>`).join('')}
+$('refreshHealth').onclick=health;
+$('changePassword').onclick=async()=>{const r=await fetch('/api/admin/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:$('currentPassword').value,new_password:$('newPassword').value})});const d=await r.json();$('passMsg').textContent=d.message||d.error||'Done';if(r.ok){$('currentPassword').value='';$('newPassword').value=''}};
+$('refreshMonth').onclick=async()=>{const r=await fetch('/api/admin/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});const d=await r.json();$('jobMsg').textContent=d.message||d.error||'Started'};
+$('clearData').onclick=async()=>{if(!confirm('This will delete ALL local market OHLC data. Continue?'))return;const r=await fetch('/api/admin/clear-market-data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirm:$('clearConfirm').value})});const d=await r.json();$('clearMsg').textContent=d.success?'Local market data cleared.':(d.error||'Failed')};
+health();

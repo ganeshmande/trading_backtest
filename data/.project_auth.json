@@ -1,0 +1,7 @@
+{
+  "algorithm": "PBKDF2-HMAC-SHA256",
+  "iterations": 240000,
+  "salt": "ef3da6145ff9d383e70dad473bc6f0f4",
+  "password_hash": "861119de4c9296470e356577ca59f1e51fda7506a3b3d70fb3a73af2ca3dd6e7",
+  "updated_at": 1790589459.8629904
+}
