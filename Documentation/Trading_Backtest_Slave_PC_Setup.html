@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trading Backtest — Slave PC Setup</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d30;--line:#2a3a52;--text:#eaf1fb;--muted:#a9bad0;--accent:#67d5b5;--blue:#82b4ff;--warn:#ffd27d}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#0b1220,#101b2e);color:var(--text);font:16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:28px 18px 60px}.hero{padding:26px;border:1px solid var(--line);border-radius:20px;background:#121d30}
+h1{line-height:1.15;margin:8px 0 12px;font-size:clamp(28px,5vw,42px)}h2{font-size:22px;margin:0 0 12px}h3{font-size:17px;margin:0 0 8px}
+p{margin:8px 0;color:var(--muted)}.tag{display:inline-block;border:1px solid #397e70;border-radius:99px;padding:4px 10px;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.06em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:16px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}
+.step{display:flex;gap:12px;align-items:flex-start}.num{flex:0 0 32px;height:32px;border-radius:10px;background:#213b56;color:var(--blue);display:grid;place-items:center;font-weight:800}
+code,pre{font-family:Consolas,"Cascadia Code",monospace}code{color:#d9e9ff;overflow-wrap:anywhere}.path{background:#0a1423;border:1px solid var(--line);padding:12px;border-radius:10px;display:block}
+pre{white-space:pre;overflow:auto;background:#07101c;border:1px solid #30435d;border-radius:12px;padding:16px;color:#d8e8fa;font-size:13px;line-height:1.5;margin:12px 0}
+button{border:0;border-radius:10px;padding:11px 15px;background:var(--accent);color:#06221c;font-weight:800;cursor:pointer;font-size:14px}button.secondary{background:#233953;color:var(--text);border:1px solid #3a5270}button:hover{filter:brightness(1.08)}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.note{border-left:4px solid var(--warn);padding:10px 14px;background:#302817;border-radius:8px;color:#f7e8c8}.good{border-left:4px solid var(--accent);padding:10px 14px;background:#102c2a;border-radius:8px;color:#d8fff5}.small{font-size:13px;color:var(--muted)}ul{padding-left:22px;color:var(--muted)}li{margin:6px 0}.status{min-height:20px;color:var(--accent);font-size:13px}.checklist label{display:flex;gap:10px;margin:10px 0;color:var(--muted)}input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px;margin-top:4px}
+a{color:var(--blue)}footer{margin-top:24px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<span class="tag">SCANNER_BY_GANESH_V5 · WINDOWS SETUP</span>
+<h1>Set up a clean Slave PC</h1>
+<p>Use this guide after syncing the <b>trading_backtest</b> repository with GitHub Desktop. The commands create a local Python environment, install project packages, and start the Flask app.</p>
+<div class="path"><b>Repository folder example</b><br><code>C:\Users\YOUR_USER\Desktop\Trading_Git\trading_backtest</code></div>
+<div class="row" style="margin-top:15px"><button onclick="copyText(document.getElementById('allCommands').textContent,'All setup commands copied')">Copy all setup commands</button><button class="secondary" onclick="copyText(document.getElementById('verifyCommands').textContent,'Verification commands copied')">Copy verification commands</button></div>
+<div id="copyStatus" class="status" aria-live="polite"></div>
+</section>
+
+<section class="card">
+<div class="step"><div class="num">1</div><div><h2>Install Python once</h2>
+<p>Your PC already has <b>Python 3.15.0</b>. This guide is configured to use Python 3.15; first test whether all packages in this repository's <code>requirements.txt</code> support it. If installation fails because a package does not support Python 3.15, use a supported Python version instead.</p>
+<p><a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener">Official Python for Windows downloads</a> · If Python 3.15.0 is already installed, you do not need to install it again.</p>
+<ul><li>If installing Python, choose the Windows 64-bit installer and tick <b>Add python.exe to PATH</b> if shown.</li><li>Close and reopen PowerShell after installation.</li><li>Verify with <code>py --version</code>; expected output for this setup is <code>Python 3.15.0</code>.</li></ul>
+<p class="small">Since your current PC reports Python 3.15.0, skip installing another version for now. If dependencies fail to install, save the complete error and then consider a compatible Python version.</p>
+</div></div>
+</section>
+
+<section class="card">
+<div class="step"><div class="num">2</div><div><h2>Sync source code using GitHub Desktop</h2>
+<ul><li>Install/open GitHub Desktop and sign in.</li><li>Clone the repository on a new PC, or open the existing local repository.</li><li>Choose the intended branch (usually <code>main</code>), then click <b>Fetch origin</b> and <b>Pull origin</b>.</li><li>Use <b>Repository → Show in Explorer</b>. Open PowerShell in that folder.</li></ul>
+<p>Do not overwrite local changes blindly. Commit/stash them first or resolve Git conflicts.</p>
+</div></div>
+</section>
+
+<section class="card">
+<div class="step"><div class="num">3</div><div><h2>Copy and run these commands</h2>
+<p>Open PowerShell in the repository root first. Replace the example folder path with the actual folder on that PC. The commands below use the current folder automatically, so no username is hard-coded.</p>
+<pre id="allCommands"># Confirm you are in the repository root
+Get-Location
+if (!(Test-Path ".\app.py")) { throw "app.py not found. Open PowerShell in the trading_backtest repository root." }
+if (!(Test-Path ".\requirements.txt")) { throw "requirements.txt not found in this folder." }
+
+# Confirm Python 3.15.0 is available
+$pyVersion = py --version 2>&1
+if ($LASTEXITCODE -ne 0) { throw "Python launcher not found. Install/configure Python and reopen PowerShell." }
+Write-Host "Detected $pyVersion"
+if ($pyVersion -notmatch "Python 3\.15\.0") { Write-Warning "This guide is configured for Python 3.15.0, but detected: $pyVersion" }
+
+# Create this PC's own virtual environment if it does not exist
+if (!(Test-Path ".\.venv\Scripts\python.exe")) {
+    py -m venv .venv
+}
+if (!(Test-Path ".\.venv\Scripts\python.exe")) { throw "Virtual environment creation failed." }
+
+# Install/update required packages
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+if ($LASTEXITCODE -ne 0) { throw "pip upgrade failed." }
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+if ($LASTEXITCODE -ne 0) { throw "Dependency installation failed. Save the complete error message." }
+
+# Start the main application
+.\.venv\Scripts\python.exe app.py</pre>
+<div class="row"><button onclick="copyText(document.getElementById('allCommands').textContent,'Setup commands copied')">Copy setup commands</button></div>
+<p class="small">Run the copied block in PowerShell. It will stop on a missing Python version or failed install rather than silently continuing.</p>
+</div></div>
+</section>
+
+<section class="card">
+<div class="step"><div class="num">4</div><div><h2>Open the dashboard</h2>
+<p>When the terminal shows that Flask is running, open:</p>
+<div class="path"><code>http://127.0.0.1:5000</code></div>
+<p>Keep the PowerShell window open while using the app. Press <code>Ctrl + C</code> in that window to stop it.</p>
+<div class="good">Each slave PC runs its own local copy of the app and its own <code>.venv</code>. Updating code through GitHub does not require recreating the environment unless you change Python versions or the environment becomes broken.</div>
+</div></div>
+</section>
+
+<section class="card">
+<div class="step"><div class="num">5</div><div><h2>When master PC code changes</h2>
+<ol><li><b>Master PC:</b> save changes → review in GitHub Desktop → commit → Push origin.</li><li><b>Each slave PC:</b> stop the app with <code>Ctrl + C</code> → Fetch origin → Pull origin.</li><li>If <code>requirements.txt</code> changed, run the dependency update command below.</li><li>Restart <code>app.py</code>.</li></ol>
+<pre id="updateCommands">.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe app.py</pre>
+<button class="secondary" onclick="copyText(document.getElementById('updateCommands').textContent,'Update commands copied')">Copy update commands</button>
+</div></div>
+</section>
+
+<section class="card">
+<h2>Important: keep data and source code separate</h2>
+<ul>
+<li><b><code>.venv/</code>:</b> local-only; do not sync or commit it. Every PC has its own environment.</li>
+<li><b><code>data/</code>:</b> contains project data/history in this application. Confirm which files Git tracks. Do not assume that data is shared just because code was pulled.</li>
+<li><b>Multiple running PCs:</b> avoid having several PCs commit changing SQLite databases or live trade-history files to the same Git branch. Database files can conflict or be overwritten. Keep a separate backup/export plan for each PC's records; share static historical candle files only when you intentionally manage them.</li>
+<li><b><code>.env</code> / API keys:</b> configure separately on each PC and never commit secrets.</li>
+<li><b>Git ignore:</b> make sure <code>.venv/</code>, <code>__pycache__/</code>, secrets and machine-specific temporary files are ignored. Decide deliberately whether historical data should be version-controlled.</li>
+</ul>
+<div class="note"><b>Important:</b> This page is a setup guide, not an automatic installer. Python must be installed first. Review any error before rerunning commands, and do not delete the <code>data/</code> folder to fix an installation issue.</div>
+</section>
+
+<section class="card checklist">
+<h2>Installation checklist</h2>
+<label><input type="checkbox"> Python 3.15.0 installed and <code>py --version</code> works</label>
+<label><input type="checkbox"> GitHub Desktop has pulled the intended branch</label>
+<label><input type="checkbox"> PowerShell is open in the repository root</label>
+<label><input type="checkbox"> Virtual environment created and requirements installed</label>
+<label><input type="checkbox"> App starts and <code>http://127.0.0.1:5000</code> opens</label>
+</section>
+
+<section class="card">
+<h2>Verification commands</h2>
+<pre id="verifyCommands">Get-Location
+py --list
+py --version
+Test-Path .\app.py
+Test-Path .\requirements.txt
+Test-Path .\.venv\Scripts\python.exe
+Get-Content .\requirements.txt
+git status --short</pre>
+<button class="secondary" onclick="copyText(document.getElementById('verifyCommands').textContent,'Verification commands copied')">Copy verification commands</button>
+</section>
+<footer>Prepared for the scanner_by_ganesh_v5 / trading_backtest Windows setup using Python 3.15.0. Python 3.15 package compatibility depends on the project dependencies; if installation fails, review the error rather than forcing incompatible packages.</footer>
+</main>
+<script>
+async function copyText(text,msg){
+  const status=document.getElementById('copyStatus');
+  try{
+    await navigator.clipboard.writeText(text);
+    status.textContent=msg+'. Paste into PowerShell with Ctrl+V.';
+  }catch(e){
+    const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    const ok=document.execCommand('copy');ta.remove();
+    status.textContent=ok?msg+'. Paste into PowerShell with Ctrl+V.':'Copy was blocked by the browser; select the command block and copy it manually.';
+  }
+}
+</script>
+</body>
+</html>
